@@ -39,6 +39,7 @@ async function handle_advance(data) {
     return "reject";
   }
 
+  sentence = sentence.toUpperCase();
   user.push({ sender: sender, payload: payload });
   userCount++;
 
@@ -56,6 +57,25 @@ async function handle_inspect(data) {
   console.log("Received inspect request data " + JSON.stringify(data));
 
   const payload = data["payload"];
+  const route = hexToString(payload);
+
+  let responseObject = undefined;
+  if (route === "list") {
+    responseObject = JSON.stringify({ user: user });
+  } else if (route === "count") {
+    responseObject = JSON.stringify({ userCount: userCount });
+  } else {
+    responseObject = "only list and count are supported";
+  }
+  const report = await fetch(rollup_server + "/report", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      payload: stringToHex(`${sentence} not in hex format`),
+    }),
+  });
 
   return "accept";
 }
