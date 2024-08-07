@@ -15,9 +15,9 @@ function stringToHex(payload) {
 function isNum(num) {
   return !isNaN(num);
 }
+
 let user = [];
 let userCount = 0;
-
 async function handle_advance(data) {
   console.log("Received advance request data " + JSON.stringify(data));
 
