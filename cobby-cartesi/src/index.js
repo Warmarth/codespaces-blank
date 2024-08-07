@@ -33,15 +33,16 @@ async function handle_advance(data) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        payload: stringToHex(`${sentence} not in hex format`),
+        payload: stringToHex(`sentence not in hex format`),
       }),
     });
+    
     return "reject";
   }
 
   sentence = sentence.toUpperCase();
-  user.push({ sender: sender, payload: payload });
-  userCount++;
+  user.push(sender);
+  userCount += 1;
 
   const notice = await fetch(rollup_server + "/notice", {
     method: "POST",
@@ -59,11 +60,11 @@ async function handle_inspect(data) {
   const payload = data["payload"];
   const route = hexToString(payload);
 
-  let responseObject = undefined;
+  let responseObject;
   if (route === "list") {
-    responseObject = JSON.stringify({ user: user });
-  } else if (route === "count") {
-    responseObject = JSON.stringify({ userCount: userCount });
+    responseObject = JSON.stringify({ user });
+  } else if (route === "total") {
+    responseObject = JSON.stringify({userCount });
   } else {
     responseObject = "only list and count are supported";
   }
@@ -73,7 +74,7 @@ async function handle_inspect(data) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      payload: stringToHex(`${sentence} not in hex format`),
+      payload: stringToHex(responseObject),
     }),
   });
 
