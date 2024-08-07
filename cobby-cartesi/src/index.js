@@ -5,66 +5,65 @@ import { isNum, hexToString, stringToHex } from "./utils/utilites";
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL;
 console.log("HTTP rollup_server url is " + rollup_server);
 
-let user = [];
-let userCount = 0;
+let users = []
+let toUpperTotal = 0
+
 async function handle_advance(data) {
   console.log("Received advance request data " + JSON.stringify(data));
 
-  const metadata = data["metadata"];
-  const sender = metadata["sender"];
-  const payload = data["payload"];
+  const metadata = data["metadata"]
+  const sender = metadata["msg_sender"]
+  const payload = data["payload"]
 
-  let sentence = hexToString(payload);
-  if (isNum(sentence)) {
-    const report = await fetch(rollup_server + "/report", {
+  let sentence = hex2str(payload)
+  if (isNumeric(sentence)) {
+    const report_req = await fetch(rollup_server + "/report", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        payload: stringToHex(`sentence not in hex format`),
-      }),
+      body: JSON.stringify({ payload: str2hex("sentence is not on hex format") }),
     });
 
-    return "reject";
+    return "reject"
   }
 
-  sentence = sentence.toUpperCase();
-  user.push(sender);
-  userCount += 1;
-
-  const notice = await fetch(rollup_server + "/notice", {
+  users.push(sender)
+  toUpperTotal += 1
+  
+  sentence = sentence.toUpperCase()
+  const notice_req = await fetch(rollup_server + "/notice", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ payload: stringToHex(sentence) }),
+    body: JSON.stringify({ payload: str2hex(sentence) }),
   });
+
   return "accept";
 }
 
 async function handle_inspect(data) {
   console.log("Received inspect request data " + JSON.stringify(data));
 
-  const payload = data["payload"];
-  const route = hexToString(payload);
+  const payload = data["payload"]
+  const route = hex2str(payload)
 
-  let responseObject;
+  let responseObject
   if (route === "list") {
-    responseObject = JSON.stringify({ user });
+    responseObject = JSON.stringify({users})
   } else if (route === "total") {
-    responseObject = JSON.stringify({ userCount });
+    responseObject = JSON.stringify({toUpperTotal})
   } else {
-    responseObject = "only list and count are supported";
+    responseObject = "route not implemented"
   }
-  const report = await fetch(rollup_server + "/report", {
+
+  const report_req = await fetch(rollup_server + "/report", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      payload: stringToHex(responseObject),
-    }),
+    body: JSON.stringify({ payload: str2hex(responseObject) }),
   });
 
   return "accept";
