@@ -1,20 +1,9 @@
 // XXX even though ethers is not used in the code below, it's very likely
 // it will be used by any DApp, so we are already including it here
-const { ethers } = require("ethers");
+import { isNum, hexToString, stringToHex } from "./utils/utilites";
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL;
 console.log("HTTP rollup_server url is " + rollup_server);
-
-function hexToString(hex) {
-  return ethers.toUtf8String(hex);
-}
-
-function stringToHex(payload) {
-  return ethers.hexlify(ethers.toUtf8Bytes(payload));
-}
-function isNum(num) {
-  return !isNaN(num);
-}
 
 let user = [];
 let userCount = 0;
@@ -36,7 +25,7 @@ async function handle_advance(data) {
         payload: stringToHex(`sentence not in hex format`),
       }),
     });
-    
+
     return "reject";
   }
 
@@ -64,7 +53,7 @@ async function handle_inspect(data) {
   if (route === "list") {
     responseObject = JSON.stringify({ user });
   } else if (route === "total") {
-    responseObject = JSON.stringify({userCount });
+    responseObject = JSON.stringify({ userCount });
   } else {
     responseObject = "only list and count are supported";
   }
